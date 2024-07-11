@@ -1,0 +1,14 @@
+version: '3'
+services:
+
+  server_nginx:
+    image: nginx:latest
+    ports:
+      - 80:8080
+    volumes:
+      - /home/ivan/task_6/nginx/nginx.conf:/etc/nginx/nginx.conf
+
+  mini_server:
+    build:
+      context: /home/ivan/
+      dockerfile: ./task_5/Dockerfile
