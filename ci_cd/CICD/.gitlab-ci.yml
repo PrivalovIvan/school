@@ -23,9 +23,9 @@ build-job:
   after_script:
     - |
       if [ "$CI_JOB_STATUS" == "success" ]; then
-       curl -s -X POST "https://api.telegram.org/bot7447177813:AAEO0tfMd7gwX1x2VrxjPitwzkLrA50m7H0/sendMessage" -d chat_id="303064959" -d text="the assembly was successful"
+       curl -s -X POST "https://api.telegram.org/<bot_key>/sendMessage" -d chat_id="303064959" -d text="the assembly was successful"
       else
-       curl -s -X POST "https://api.telegram.org/bot7447177813:AAEO0tfMd7gwX1x2VrxjPitwzkLrA50m7H0/sendMessage" -d chat_id="303064959" -d text="the build was not successful"
+       curl -s -X POST "https://api.telegram.org/<bot_key>/sendMessage" -d chat_id="303064959" -d text="the build was not successful"
       fi
 
 style-job:
@@ -41,10 +41,10 @@ style-job:
         if [ -s ../../test.txt ]; then
           cat ../../test.txt
           rm ../../test.txt
-          curl -s -X POST "https://api.telegram.org/bot7447177813:AAEO0tfMd7gwX1x2VrxjPitwzkLrA50m7H0/sendMessage" -d chat_id="303064959" -d text="Clang-Format Error"
+          curl -s -X POST "https://api.telegram.org/<bot_key>/sendMessage" -d chat_id="303064959" -d text="Clang-Format Error"
           exit 1
         else
-          curl -s -X POST "https://api.telegram.org/bot7447177813:AAEO0tfMd7gwX1x2VrxjPitwzkLrA50m7H0/sendMessage" -d chat_id="303064959" -d text="All files correspond to the code style"
+          curl -s -X POST "https://api.telegram.org/<bot_key>/sendMessage" -d chat_id="303064959" -d text="All files correspond to the code style"
           echo "Все файлы соответствуют кодстайлу."
         fi
     - rm -rf ../../test.txt
@@ -66,10 +66,10 @@ test-job:
       if [ -s ../../fail.txt ]; then
         echo "The test was not passed"
         rm -rf ../../fail.txt
-        curl -s -X POST "https://api.telegram.org/bot7447177813:AAEO0tfMd7gwX1x2VrxjPitwzkLrA50m7H0/sendMessage" -d chat_id="303064959" -d text="The test was not passed!"
+        curl -s -X POST "https://api.telegram.org/<bot_key>/sendMessage" -d chat_id="303064959" -d text="The test was not passed!"
         exit 1
       else
-        curl -s -X POST "https://api.telegram.org/bot7447177813:AAEO0tfMd7gwX1x2VrxjPitwzkLrA50m7H0/sendMessage" -d chat_id="303064959" -d text="The test is passed!"
+        curl -s -X POST "https://api.telegram.org/<bot_key>/sendMessage" -d chat_id="303064959" -d text="The test is passed!"
         echo "The test is passed"
       fi
       rm -rf ../../fail.txt
@@ -88,8 +88,8 @@ deploy-job:
   after_script:
     - |
       if [ "$CI_JOB_STATUS" == "success" ]; then
-       curl -s -X POST "https://api.telegram.org/bot7447177813:AAEO0tfMd7gwX1x2VrxjPitwzkLrA50m7H0/sendMessage" -d chat_id="303064959" -d text="Deploy successful"
+       curl -s -X POST "https://api.telegram.org/<bot_key>/sendMessage" -d chat_id="303064959" -d text="Deploy successful"
       else
-       curl -s -X POST "https://api.telegram.org/bot7447177813:AAEO0tfMd7gwX1x2VrxjPitwzkLrA50m7H0/sendMessage" -d chat_id="303064959" -d text="Deploy Failed"
+       curl -s -X POST "https://api.telegram.org/<bot_key>/sendMessage" -d chat_id="303064959" -d text="Deploy Failed"
        exit 0
        fi
