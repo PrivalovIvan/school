@@ -1,0 +1,95 @@
+stages:
+  - build
+  - style
+  - test
+  - deploy
+
+build-job:
+  stage: build
+  script:
+    - mkdir -p artifacts
+    - echo "Сборка Cat"
+    - cd src/cat
+    - make
+    - cp s21_cat ../../artifacts
+    - echo "Сборка Grep"
+    - cd ../grep
+    - make
+    - cp s21_grep ../../artifacts
+  artifacts:
+    paths:
+      - artifacts
+    expire_in: 1 month
+  after_script:
+    - |
+      if [ "$CI_JOB_STATUS" == "success" ]; then
+       curl -s -X POST "https://api.telegram.org/bot7447177813:AAEO0tfMd7gwX1x2VrxjPitwzkLrA50m7H0/sendMessage" -d chat_id="303064959" -d text="the assembly was successful"
+      else
+       curl -s -X POST "https://api.telegram.org/bot7447177813:AAEO0tfMd7gwX1x2VrxjPitwzkLrA50m7H0/sendMessage" -d chat_id="303064959" -d text="the build was not successful"
+      fi
+
+style-job:
+  stage: style
+  script:
+    - echo "Проверка кодстайла Cat с помощью clang-format"
+    - cd src/cat
+    - make style_check 2>> ../../test.txt
+    - echo "Проверка кодстайла Grep с помощью clang-format"
+    - cd ../grep
+    - make style_check 2>> ../../test.txt
+    - |
+        if [ -s ../../test.txt ]; then
+          cat ../../test.txt
+          rm ../../test.txt
+          curl -s -X POST "https://api.telegram.org/bot7447177813:AAEO0tfMd7gwX1x2VrxjPitwzkLrA50m7H0/sendMessage" -d chat_id="303064959" -d text="Clang-Format Error"
+          exit 1
+        else
+          curl -s -X POST "https://api.telegram.org/bot7447177813:AAEO0tfMd7gwX1x2VrxjPitwzkLrA50m7H0/sendMessage" -d chat_id="303064959" -d text="All files correspond to the code style"
+          echo "Все файлы соответствуют кодстайлу."
+        fi
+    - rm -rf ../../test.txt
+  allow_failure: false
+  only:
+    - develop
+
+test-job:
+  stage: test
+  script:
+    - echo "Test Cat"
+    - cd src/cat
+    - make test
+#    - echo "Test Grep"
+#    - cd ../grep
+#    - make test
+
+    - |
+      if [ -s ../../fail.txt ]; then
+        echo "The test was not passed"
+        rm -rf ../../fail.txt
+        curl -s -X POST "https://api.telegram.org/bot7447177813:AAEO0tfMd7gwX1x2VrxjPitwzkLrA50m7H0/sendMessage" -d chat_id="303064959" -d text="The test was not passed!"
+        exit 1
+      else
+        curl -s -X POST "https://api.telegram.org/bot7447177813:AAEO0tfMd7gwX1x2VrxjPitwzkLrA50m7H0/sendMessage" -d chat_id="303064959" -d text="The test is passed!"
+        echo "The test is passed"
+      fi
+      rm -rf ../../fail.txt
+  only:
+    - develop
+
+
+deploy-job:
+  stage: deploy
+  script:
+    - chmod 777 script_cd.sh
+    - bash script_cd.sh
+  when: manual
+  only:
+    - develop
+  after_script:
+    - |
+      if [ "$CI_JOB_STATUS" == "success" ]; then
+       curl -s -X POST "https://api.telegram.org/bot7447177813:AAEO0tfMd7gwX1x2VrxjPitwzkLrA50m7H0/sendMessage" -d chat_id="303064959" -d text="Deploy successful"
+      else
+       curl -s -X POST "https://api.telegram.org/bot7447177813:AAEO0tfMd7gwX1x2VrxjPitwzkLrA50m7H0/sendMessage" -d chat_id="303064959" -d text="Deploy Failed"
+       exit 0
+       fi
