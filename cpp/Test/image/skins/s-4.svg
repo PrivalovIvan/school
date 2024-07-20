@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.0//EN'
+          'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg clip-rule="evenodd" fill-rule="evenodd" height="3933.0" image-rendering="optimizeQuality" preserveAspectRatio="xMidYMid meet" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.0" viewBox="0.0 0.0 2317.1 3933.0" width="2317.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" zoomAndPan="magnify"
+><g
+  ><g id="change1_1"
+    ><path d="M510 0L510 1174 1389 1845 2232 1444 2317 1379z" fill="#00afef"
+    /></g
+    ><g id="change1_2"
+    ><path d="M1807 3933L1807 2758 928 2088 85 2488 0 2553z" fill="#00afef"
+    /></g
+    ><g id="change2_1"
+    ><path d="M0 0H1321V1807H0z" fill="#3e4095" transform="matrix(0 -.8888 -1 .76319 2317.11 2553.39)"
+    /></g
+    ><g id="change2_2"
+    ><path d="M0 0H1321V1807H0z" fill="#3e4095" transform="matrix(0 .8888 1 -.76319 .003 1379.22)"
+    /></g
+  ></g
+></svg
+>
