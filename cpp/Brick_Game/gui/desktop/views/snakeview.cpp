@@ -57,10 +57,14 @@ void s21::SnakeView::paintEvent(QPaintEvent *event) {
       }
       return;
     } else {
+        if (action == Pause){
+        printPause(font,painter);
+        }else {
       printDataTetris(font, painter);
       printFieldTetris(painter);
       printNextFigureTetris(painter);
     }
+}
   }
 }
 // SNAKE
@@ -215,7 +219,7 @@ void s21::SnakeView::loadBackgrounds(QDir &curD) {
   QString pathBackground1 =
       curD.absolutePath().append("/backgrounds/back2.jpg");
   QString pathBackground2 =
-      curD.absolutePath().append("/backgrounds/back4.jpg");
+      curD.absolutePath().append("/backgrounds/back7.jpg");
   backgrounds[0] = QPixmap(pathBackground1);
   backgrounds[1] = QPixmap(pathBackground2);
 }

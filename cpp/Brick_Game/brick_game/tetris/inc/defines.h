@@ -32,26 +32,46 @@
 #define Y_P(i) list[sh->num_shape].figure[i][0]
 #define X_P(i) list[sh->num_shape].figure[i][1]
 
+// /**
+//  * @brief инициализация поля для игры
+//  *
+//  */
+// #define INIT_FIELD(y, x)                                                       \
+// g_info.field = (int **)calloc(y, sizeof(int *));                             \
+//     for (int i = 0; i < y; i++)                                                  \
+//     g_info.field[i] = (int *)calloc(x, sizeof(int));                           \
+//     for (int i{}; i < 21; i++)                                                   \
+//     for (int j{}; j < 10; j++)                                                 \
+//     g_info.field[i][j] = -1;
 /**
  * @brief инициализация поля для игры
  *
  */
 #define INIT_FIELD(y, x)                                                       \
-  g_info.field = (int **)calloc(y, sizeof(int *));                             \
+  g_info->field = (int **)calloc(y, sizeof(int *));                             \
   for (int i = 0; i < y; i++)                                                  \
-    g_info.field[i] = (int *)calloc(x, sizeof(int));                           \
-  for (int i{}; i < 21; i++)                                                   \
-    for (int j{}; j < 10; j++)                                                 \
-      g_info.field[i][j] = -1;
+    g_info->field[i] = (int *)calloc(x, sizeof(int));                           \
+  for (int i = 0; i < 21; i++)                                                   \
+    for (int j = 0; j < 10; j++)                                                 \
+      g_info->field[i][j] = -1;
+// /**
+//  * @brief инициализация поля для отрисовки слудующей фигуры в окне с данными для
+//  * игры
+//  *
+//  */
+// #define INIT_NEXT_FIGURE(y, x)                                                 \
+// g_info.next = (int **)calloc(y, sizeof(int *));                              \
+//     for (int i = 0; i < y; i++)                                                  \
+//     g_info.next[i] = (int *)calloc(x, sizeof(int));
 /**
  * @brief инициализация поля для отрисовки слудующей фигуры в окне с данными для
  * игры
  *
  */
 #define INIT_NEXT_FIGURE(y, x)                                                 \
-  g_info.next = (int **)calloc(y, sizeof(int *));                              \
+  g_info->next = (int **)calloc(y, sizeof(int *));                              \
   for (int i = 0; i < y; i++)                                                  \
-    g_info.next[i] = (int *)calloc(x, sizeof(int));
+    g_info->next[i] = (int *)calloc(x, sizeof(int));
 
 /**
  * @brief инициализация окна с игрой

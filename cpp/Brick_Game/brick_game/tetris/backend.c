@@ -3,6 +3,8 @@
 // STATE START
 
 int init_stats(GameInfo_t *g_info) {
+INIT_FIELD(21,10);
+INIT_NEXT_FIGURE(4,4)
   read_hi_score(g_info);
   g_info->score = 0;
   g_info->level = 1;
@@ -45,7 +47,8 @@ void add_figure_in_next(GameInfo_t *g_info, shapes_s *list, shapes_s *sh) {
 
 void add_figure_in_place(GameInfo_t *g_info, shapes_s *list, shapes_s *sh) {
   for (int i = 0; i < 4; i++)
-    g_info->field[Y_P(i) + sh->shift_down][X_P(i) + sh->move_shapes] = 1;
+    g_info->field[Y_P(i) + sh->shift_down][X_P(i) + sh->move_shapes] =
+        list[sh->num_shape].id;
 }
 
 void exit_game(GameInfo_t g_info) {
@@ -85,10 +88,10 @@ int shifting_block_down(GameInfo_t *g_info, shapes_s *list, shapes_s *sh,
 // Проверка следющей строки
 int check_next_rows(GameInfo_t g_info, shapes_s *list, shapes_s sh, int x) {
   int del = 0;
-  if (g_info.field[CHECK_Y_0(x) + sh.shift_down + x][CHECK_X_0(x)] == 1 or
-      g_info.field[CHECK_Y_1(x) + sh.shift_down + x][CHECK_X_1(x)] == 1 or
-      g_info.field[CHECK_Y_2(x) + sh.shift_down + x][CHECK_X_2(x)] == 1 or
-      g_info.field[CHECK_Y_3(x) + sh.shift_down + x][CHECK_X_3(x)] == 1) {
+  if (g_info.field[CHECK_Y_0(x) + sh.shift_down + x][CHECK_X_0(x)] >= 0 or
+      g_info.field[CHECK_Y_1(x) + sh.shift_down + x][CHECK_X_1(x)] >= 0 or
+      g_info.field[CHECK_Y_2(x) + sh.shift_down + x][CHECK_X_2(x)] >= 0 or
+      g_info.field[CHECK_Y_3(x) + sh.shift_down + x][CHECK_X_3(x)] >= 0) {
     del = 1;
   }
   return del;
@@ -99,18 +102,18 @@ int check_next_rows(GameInfo_t g_info, shapes_s *list, shapes_s sh, int x) {
 int check_last_line(GameInfo_t *g_info) {
   int temp = 0;
   for (int i = 0; i < 10; i++) {
-    if (g_info->field[0][i] == 1) {
+    if (g_info->field[0][i] >= 0) {
       temp = 1;
     }
   }
   return temp;
 }
 
-int check_line(GameInfo_t *g_info) {
+int check_line(GameInfo_t *g_info /*, shapes_s *list, shapes_s sh*/) {
   int line = 0, line_qty = 0, i = 0, end = 0;
   for (i = 0; i < 20; i++) {
     for (int j = 0; j < 10; j++) {
-      if (g_info->field[i][j] == 1)
+      if (g_info->field[i][j] >= 0)
         line = 1;
       else {
         line = 0;
@@ -124,10 +127,11 @@ int check_line(GameInfo_t *g_info) {
         g_info->field[i][k] = 0, line = 0;
       for (int a = i; a > 1; a--) {
         for (int b = 0; b < 10; b++) {
-          if (g_info->field[a - 1][b] == 1)
-            g_info->field[a][b] = 1;
-          if (g_info->field[a - 1][b] == 0)
-            g_info->field[a][b] = 0;
+          if (g_info->field[a - 1][b] >= 0)
+            g_info->field[a][b] = g_info->field[a - 1][b];
+          // g_info->field[a][b] = list[sh.move_shapes].id;
+          if (g_info->field[a - 1][b] < 0)
+            g_info->field[a][b] = -1;
         }
       }
       if (line_qty == 1)
@@ -151,9 +155,8 @@ int shift_left(shapes_s *sh, GameInfo_t g_info, shapes_s *list) {
   int ok = 0;
   if (sh->move_shapes) {
     for (int i = 0; i < 4; i++) {
-      if (g_info
-              .field[list[sh->num_shape].figure[i][0] + sh->shift_down]
-                    [list[sh->num_shape].figure[i][1] + sh->move_shapes - 1] ==
+      if (g_info.field[list[sh->num_shape].figure[i][0] + sh->shift_down]
+                      [list[sh->num_shape].figure[i][1] + sh->move_shapes - 1] <
           0) {
         ok = 1;
       } else {
@@ -171,9 +174,8 @@ int shift_right(shapes_s *sh, GameInfo_t g_info, shapes_s *list) {
   int ok2 = 0;
   if (sh->move_shapes + list[sh->num_shape].right < 10) {
     for (int i = 0; i < 4; i++) {
-      if (g_info
-              .field[list[sh->num_shape].figure[i][0] + sh->shift_down]
-                    [list[sh->num_shape].figure[i][1] + sh->move_shapes + 1] ==
+      if (g_info.field[list[sh->num_shape].figure[i][0] + sh->shift_down]
+                      [list[sh->num_shape].figure[i][1] + sh->move_shapes + 1] <
           0)
         ok2 = 1;
       else {
@@ -216,16 +218,16 @@ int checking_on_the_right_for_turn(GameInfo_t g_info, shapes_s *list,
                                    shapes_s sh, int x) {
   int result = 0;
   if ((g_info.field[list[sh.num_shape + x].figure[0][0] + sh.shift_down + 1]
-                   [list[sh.num_shape + x].figure[0][1] + sh.move_shapes] ==
+                   [list[sh.num_shape + x].figure[0][1] + sh.move_shapes] <
        0) and
       (g_info.field[list[sh.num_shape + x].figure[1][0] + sh.shift_down + 1]
-                   [list[sh.num_shape + x].figure[1][1] + sh.move_shapes] ==
+                   [list[sh.num_shape + x].figure[1][1] + sh.move_shapes] <
        0) and
       (g_info.field[list[sh.num_shape + x].figure[2][0] + sh.shift_down + 1]
-                   [list[sh.num_shape + x].figure[2][1] + sh.move_shapes] ==
+                   [list[sh.num_shape + x].figure[2][1] + sh.move_shapes] <
        0) and
       (g_info.field[list[sh.num_shape + x].figure[3][0] + sh.shift_down + 1]
-                   [list[sh.num_shape + x].figure[3][1] + sh.move_shapes] == 0))
+                   [list[sh.num_shape + x].figure[3][1] + sh.move_shapes] < 0))
     result = 1;
   return result;
 }
@@ -233,13 +235,13 @@ int checking_on_the_down_for_turn(GameInfo_t g_info, shapes_s *list,
                                   shapes_s sh, int x) {
   int result = 0;
   if ((g_info.field[list[sh.num_shape + x].p1 + sh.shift_down + 1]
-                   [sh.move_shapes] == 0) and
+                   [sh.move_shapes] < 0) and
       (g_info.field[list[sh.num_shape + x].p2 + sh.shift_down + 1]
-                   [sh.move_shapes] == 0) and
+                   [sh.move_shapes] < 0) and
       (g_info.field[list[sh.num_shape + x].p3 + sh.shift_down + 1]
-                   [sh.move_shapes] == 0) and
+                   [sh.move_shapes] < 0) and
       (g_info.field[list[sh.num_shape + x].p4 + sh.shift_down + 1]
-                   [sh.move_shapes] == 0))
+                   [sh.move_shapes] < 0))
     result = 1;
   return result;
 }
@@ -257,7 +259,7 @@ void clean_memory_matrix(GameInfo_t *g_info) {
 void remove_block(GameInfo_t *g_info, shapes_s *list, shapes_s *sh) {
   for (int i = 0; i < 4; i++)
     g_info->field[list[sh->num_shape].figure[i][0] + sh->shift_down]
-                 [list[sh->num_shape].figure[i][1] + sh->move_shapes] = 0;
+                 [list[sh->num_shape].figure[i][1] + sh->move_shapes] = -1;
 }
 
 void pause_game(wins *win) {
@@ -305,7 +307,7 @@ void read_hi_score(GameInfo_t *g_info) {
 void clear_field(GameInfo_t *g_info) {
   for (int i = 0; i < 20; i++) {
     for (int j = 0; j < 10; j++) {
-      g_info->field[i][j] = 0;
+      g_info->field[i][j] = -1;
     }
   }
 }

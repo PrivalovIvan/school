@@ -122,4 +122,4 @@ void attaching(params_t *p) {
     clear_field(p->g_info);
   }
 }
-void exit_app(params_t *p) { clear_field(p->g_info); }
+void exit_app(params_t *p) { clear_field(p->g_info); clean_memory_matrix(p->g_info); }

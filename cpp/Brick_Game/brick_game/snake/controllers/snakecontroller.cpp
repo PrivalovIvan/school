@@ -14,14 +14,12 @@ s21::SnakeController::SnakeController(s21::SnakeModel *model,
   fsm = new FsmM(model, view);
   tempDir = s21::SnakeModel::Right;
 
-  // TETRIS
-  INIT_FIELD(21, 10)
-  INIT_NEXT_FIGURE(4, 4)
-  system("mkdir -p hi_score");
-
+  // Tetris
   init_list_shape(list);
+
   state = NONE;
   action = No_sig;
+  g_info.high_score = 0;
 
   setState();
   setAction();
@@ -62,70 +60,11 @@ void s21::SnakeController::gameLoop() {
   else if (state == GAME_OVER) {
     model->setMg(SnakeModel::Tetris_game);
     state = NONE;
-    action = Terminate;
+    action = Start;
   } else
     s21::SnakeController::SnakeLoop();
 }
-void s21::SnakeController::SnakeLoop() {
-  setSnake();
-  setFood();
-  setScore();
-  setFruits();
-  setMaxScore();
 
-  if (model->score > model->maxScore)
-    model->writeScore(), model->readScore();
-
-  if (level < 10)
-    model->changeLevel(level, speed);
-  view->setLevel(level);
-
-  if (SnakeModel::WinGame == model->getDir() or
-      SnakeModel::GameOver == model->getDir()) {
-    timer->start(300);
-  } else {
-    qDebug() << "                   " << speed << "!!!!!!!!!!!!!!!!!!!!!!!";
-    timer->start(speed);
-  }
-
-  fsm->executeAction(fsm->getSt(), model->getDir());
-  view->update();
-
-  if (model->getMg()) {
-    view->update();
-    if (model->getMg() == SnakeModel::Exit)
-      view->close();
-  }
-}
-
-void s21::SnakeController::TetrisLoop() {
-  if (g_info.high_score < g_info.score) {
-    write_hi_score(g_info);
-    read_hi_score(&g_info);
-  }
-  init_list_shape(list);
-  if (action != No_sig)
-    speed_game(&g_info);
-
-  sigact(get_signal(action), &state, &g_info, list, &sh);
-
-  if (state == GAME_OVER) {
-    timer->start(500);
-  } else
-    timer->start(BASE_SPEED - g_info.speed);
-
-  if (state != MOVING and state != START)
-    action = No_sig;
-
-  if (state == MOVING and action == No_sig)
-    state = SHIFTING;
-
-  setIdFigure();
-  setIdNextFigure();
-
-  setG_Info();
-  view->update();
-}
 void s21::SnakeController::controlMenu(QKeyEvent *event) {
   switch (event->key()) {
   case Qt::Key_Up:
@@ -157,6 +96,7 @@ void s21::SnakeController::controlMenu(QKeyEvent *event) {
     break;
   }
 }
+
 void s21::SnakeController::controlSnake(QKeyEvent *event) {
   switch (event->key()) {
   case Qt::Key_Up:
@@ -231,13 +171,46 @@ void s21::SnakeController::controlSnake(QKeyEvent *event) {
     tempDir = model->getDir();
   }
 }
+void s21::SnakeController::SnakeLoop() {
+  setSnake();
+  setFood();
+  setScore();
+  setFruits();
+  setMaxScore();
+
+  if (model->score > model->maxScore)
+    model->writeScore("/scoreSnake.txt", model->maxScore), model->readScore("/scoreSnake.txt",model->maxScore);
+
+  if (level < 10)
+    model->changeLevel(level, speed);
+  view->setLevel(level);
+
+  if (SnakeModel::WinGame == model->getDir() or
+      SnakeModel::GameOver == model->getDir()) {
+    timer->start(300);
+  } else {
+    // qDebug() << "                   " << speed << "!!!!!!!!!!!!!!!!!!!!!!!";
+    timer->start(speed);
+  }
+
+  fsm->executeAction(fsm->getSt(), model->getDir());
+  view->update();
+
+  if (model->getMg()) {
+    view->update();
+    if (model->getMg() == SnakeModel::Exit)
+      view->close();
+  }
+}
+
 void s21::SnakeController::controlTetris(QKeyEvent *event) {
   switch (event->key()) {
   case Qt::Key_S:
     action = Start;
     break;
   case Qt::Key_Space:
-    action = Pause;
+  if (action == Pause) action = No_sig;
+  else action = Pause;
     break;
   case Qt::Key_Left:
     action = Left;
@@ -259,4 +232,37 @@ void s21::SnakeController::controlTetris(QKeyEvent *event) {
     action = No_sig;
     break;
   }
+}
+void s21::SnakeController::TetrisLoop() {
+if (action!= Pause) {
+  if (g_info.high_score < g_info.score) {
+        model->writeScore("/scoreTetris.txt",g_info.score);
+  }
+  model->readScore("/scoreTetris.txt",g_info.high_score);
+
+  init_list_shape(list);
+  if (action != No_sig)
+    speed_game(&g_info);
+
+  sigact(get_signal(action), &state, &g_info, list, &sh);
+
+  if (state == GAME_OVER) {
+    timer->start(500);
+  } else{
+  speed = BASE_SPEED - g_info.speed;
+    timer->start(speed);
+}
+
+  if (state != MOVING and state != START)
+    action = No_sig;
+
+  if (state == MOVING and action == No_sig)
+    state = SHIFTING;
+}
+
+  setIdFigure();
+  setIdNextFigure();
+
+  setG_Info();
+  view->update();
 }

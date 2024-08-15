@@ -10,15 +10,12 @@ extern "C" {
 
 int main(int argc, char *argv[]) {
   QApplication brickGame(argc, argv);
-  qDebug() << "1";
   // brickGame.setWindowIcon(QIcon("../../../../../gui/desktop/image/fruits/f3.svg"));
-  // brickGame.setWindowIcon(QIcon("/Users/ivanprivalov/Test/gui/desktop/image/skins/s-6.svg"));
+  brickGame.setWindowIcon(QIcon("/Users/ivanprivalov/Brick_Game/gui/desktop/image/skins/s-6.svg"));
   s21::SnakeView view;
-  qDebug() << "2";
+  // view.setWindowIcon(QIcon("/Users/ivanprivalov/Test/gui/desktop/image/skins/s-6.svg"));
   s21::SnakeModel model;
-  qDebug() << "3";
   s21::SnakeController controller(&model, &view);
-  qDebug() << "4";
   view.show();
 
   return brickGame.exec();

@@ -6,7 +6,7 @@ s21::SnakeModel::SnakeModel()
   initGame();
   add_fruits();
   generateFood();
-  readScore();
+  readScore("/scoreSnake.txt", this->maxScore);
 }
 
 void s21::SnakeModel::initGame() {
@@ -98,41 +98,47 @@ bool s21::SnakeModel::eatFruit() {
   }
   return false;
 }
-void s21::SnakeModel::readScore() {
+void s21::SnakeModel::readScore(QString nameFile, int & score) {
   QString executableDir = QCoreApplication::applicationDirPath();
   QDir curD(executableDir);
   curD.cd("../../../../../brick_game/snake/max_score");
-  QString path = curD.absolutePath().append("/score.txt");
+  // QString path = curD.absolutePath().append("/score.txt");
+  QString path = curD.absolutePath().append(nameFile);
   QFile file(path);
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    qDebug() << "Cannot open file for reading: " << file.errorString();
+    // qDebug() << "Cannot open file for reading: " << file.errorString();
+    writeScore(nameFile,score);
     return;
   }
   QTextStream in(&file);
   QString content = in.readAll();
   // qDebug() << content;
-  this->maxScore = content.toInt();
+  score = content.toInt();
 
   file.close();
 }
-void s21::SnakeModel::writeScore() {
+void s21::SnakeModel::writeScore(QString nameFile, int & score) {
   QString executableDir = QCoreApplication::applicationDirPath();
   QDir curD(executableDir);
   curD.cd("../../../../../brick_game/snake/max_score");
-  QString path = curD.absolutePath().append("/score.txt");
+  // QString path = curD.absolutePath().append("/score.txt");
+  QString path = curD.absolutePath().append(nameFile);
   QFile file(path);
   if (!file.open(QIODevice::WriteOnly)) {
     qDebug() << "Cannot open file for writing: " << file.errorString();
     return;
   }
   QTextStream out(&file);
-  out << (this->maxScore += 1);
+  // out << (this->maxScore += 1);
+
+  if (nameFile.contains( "/scoreSnake.txt")) out << (score += 1);
+  else out << (score);
 
   file.close();
 }
 void s21::SnakeModel::changeScore() {
   if (this->score > this->maxScore) {
-    writeScore();
+    writeScore("scoreSnake.txt",maxScore);
   }
 }
 void s21::SnakeModel::changeLevel(int &level, int &speed) {

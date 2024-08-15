@@ -6,6 +6,8 @@ HEADER_FILES_SNAKE = brick_game/snake/controllers/snakecontroller.h brick_game/s
 SRC_FILES_TETRIS = brick_game/tetris/backend.c brick_game/tetris/fsm.c brick_game/tetris/init_shapes.c brick_game/tetris/tetris.c
 HEADER_FILES_TETRIS = brick_game/tetris/inc/*
 
+MYPATH =  $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+
 all: clean install
 
 st:
@@ -13,11 +15,15 @@ st:
 check:
 	@clang-format -n ${SRC_FILES_SNAKE} ${HEADER_FILES_SNAKE} ${SRC_FILES_TETRIS} ${HEADER_FILES_TETRIS} main.cpp
 
+test:
+#	echo "Makefile is located in: $(MYPATH)"
+
 install:
 	@mkdir -p build/bk
-	@cd build/bk && qmake ../../Test.pro && make 
+	@cd build/bk && qmake ../../Brick_Game.pro && make 
 	@rm -rf build/bk/*.cpp build/bk/*.h  build/bk/*.o build/bk/Makefile .qmake.stash
 #	@open ./build/bk
-	./build/bk/Test.app/Contents/MacOS/Test
+#	./build/bk/Test.app/Contents/MacOS/Test
+	@ln -s $(MYPATH)/build/bk/Test.app ~/Desktop
 clean:
-	@rm -rf build
+	@rm -rf build ~/Desktop/Test.app brick_game/snake/max_score/*.txt

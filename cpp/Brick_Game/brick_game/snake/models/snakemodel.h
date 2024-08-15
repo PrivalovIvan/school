@@ -50,8 +50,8 @@ public:
 
   bool processingSignal;
 
-  void readScore();
-  void writeScore();
+  void readScore(QString nameFile, int & score);
+  void writeScore(QString nameFile, int & score);
   void changeScore();
   void changeLevel(int &level, int &speed);
 
